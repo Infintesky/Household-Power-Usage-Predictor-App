@@ -22,22 +22,6 @@ for key in ["temperature", "humidity", "wind_speed"]:
 st.set_page_config(page_title="Household Power Usage Predictor - UK (London)")
 st.header("Household Power Usage Predictor - UK (London)")
 
-# Button to autofill using realtime weather data
-if st.button("Autofill With Realtime Weather Data (London)"):
-    try:
-        api_key = get_api_key()
-        weather_data = get_weather_data(api_key, location="London")
-        weather_info = extract_weather_info(weather_data)
-
-        st.session_state.temperature = weather_info["temperature"]
-        st.session_state.humidity = weather_info["humidity"]
-        st.session_state.wind_speed = weather_info["wind_speed"]
-
-        st.info(f"Fetched: Temperature 🌡️ {weather_info['temperature']}°C | Humidity 💧 {weather_info['humidity']}% | Wind Speed 🌬️ {weather_info['wind_speed']} km/h")
-
-    except Exception as e:
-        st.error(f"Failed to fetch realtime weather data: {e}")
-
 # Season selector
 season = st.selectbox(
     "Select a season:",
@@ -62,11 +46,27 @@ params = season_params[season]
 # Input fields for user data (with realtime defaults if available)
 st.subheader("Enter Weather Conditions:")
 
+# Button to autofill using realtime weather data
+if st.button("Autofill With Realtime Weather Data (London)"):
+    try:
+        api_key = get_api_key()
+        weather_data = get_weather_data(api_key, location="London")
+        weather_info = extract_weather_info(weather_data)
+
+        st.session_state.temperature = weather_info["temperature"]
+        st.session_state.humidity = weather_info["humidity"]
+        st.session_state.wind_speed = weather_info["wind_speed"]
+
+        st.info(f"Fetched: Temperature 🌡️ {weather_info['temperature']}°C | Humidity 💧 {weather_info['humidity']}% | Wind Speed 🌬️ {weather_info['wind_speed']} km/h")
+
+    except Exception as e:
+        st.error(f"Failed to fetch realtime weather data: {e}")
+
 temperature = st.number_input(
     "Temperature (°C)",
     min_value=params["temp_min"],
     max_value=params["temp_max"],
-    value=st.session_state.temperature if st.session_state.temperature is not None else params["temp_val"],
+    value=st.session_state.temperature if st.session_state.temperature is not None and st.session_state.temperature > params["temp_min"] else params["temp_val"],
     step=0.1
 )
 
@@ -74,7 +74,7 @@ humidity = st.number_input(
     "Humidity (%)",
     min_value=params["humidity_min"],
     max_value=params["humidity_max"],
-    value=st.session_state.humidity if st.session_state.humidity is not None else params["humidity_val"],
+    value=st.session_state.humidity if st.session_state.humidity is not None and st.session_state.humidity > params["humidity_min"] else params["humidity_val"],
     step=1.0
 )
 
@@ -82,7 +82,7 @@ wind_speed = st.number_input(
     "Wind Speed (km/h)",
     min_value=params["wind_min"],
     max_value=params["wind_max"],
-    value=st.session_state.wind_speed if st.session_state.wind_speed is not None else params["wind_val"],
+    value=st.session_state.wind_speed if st.session_state.wind_speed is not None and st.session_state.wind_speed > params["wind_min"] else params["wind_val"],
     step=0.1
 )
 
