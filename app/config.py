@@ -29,10 +29,3 @@ season_params = {
         "wind_min": 0.0, "wind_max": 30.0, "wind_val": 10.0
     }
 }
-
-# Prediction function
-def predict_power_usage(beta: np.ndarray, temp: float, humidity: float, wind: float) -> float:
-    # Construct feature vector: [1, temp, humidity, wind]
-    x = np.array([[1.0], [temp], [humidity], [wind]])
-    prediction = float(np.dot(beta.T, x))
-    return prediction
